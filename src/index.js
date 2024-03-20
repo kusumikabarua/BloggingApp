@@ -5,11 +5,13 @@ const app = express();
 const PORT = process.env.PORT || 4000;
 const authRoutes = require("./routes/authRoutes");
 const blogRoutes = require("./routes/blogRoutes");
+const commentRoutes = require("./routes/commentRoutes")
 const cors =require("cors");
 app.use(cors());
 app.use(express.json());
 
 app.use("/api/blogs",blogRoutes);
+app.use("/api/comments",commentRoutes);
 app.use("/api/auth",authRoutes);
 
 mongoose

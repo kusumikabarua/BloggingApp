@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const commentSchema = mongoose.Schema(
     {
       title: {
@@ -24,6 +25,6 @@ const commentSchema = mongoose.Schema(
       timestamps: true,
     }
   );
-  const Comment = mongoose.model("Blog",commentSchema);
+  const Comment = mongoose.model("Comment",commentSchema);
   module.exports =Comment;
   
