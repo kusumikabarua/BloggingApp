@@ -3,7 +3,7 @@ const authenticateToken = require("../middleware/authenticateToken");
 const blogController = require("../controllers/blogController")
 const router = express.Router();
 router.post("/",authenticateToken,blogController.createBlog) ;
-router.get("/",blogController.getAllBlogs);
+router.get("/",authenticateToken,blogController.getAllBlogs);
 router.put("/:id",authenticateToken,blogController.updateBlog);
 router.delete("/:id",authenticateToken,blogController.deleteBLog);
 

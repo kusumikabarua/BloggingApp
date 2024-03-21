@@ -16,7 +16,9 @@ const createBlog = async (req, res) => {
 };
 const getAllBlogs = async (req, res) => {
   try {
-    const blogs = await blogService.getAllBlogs();
+    const userId = req.user.id;
+   
+    const blogs = await blogService.getAllBlogs(userId);
     res.status(200).json(blogs);
   } catch (error) {
     res.status(500).json({ message: error.message });

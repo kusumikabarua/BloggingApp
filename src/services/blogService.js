@@ -1,15 +1,25 @@
 const Blog = require("../models/Blog");
 const createBlog = async (blogData) => {
   try {
+    console.log("Create");
     const blog = await Blog.create(blogData);
     return blog;
   } catch (error) {
     throw error;
   }
 };
-const getAllBlogs= async () => {
+const getAllBlogs= async (userIdFromToken) => {
   try {
-    const blogs = await Blog.find();
+    let blogs = await Blog.find();
+   
+    for(let i=0;i<blogs.length;i++){
+     let {_id,title,description,userId} =blogs[i];
+      if(blogs[i].userId ==userIdFromToken){
+        blogs[i]= {_id,title,description,userId,isUpdateDelete:true};
+      }else{
+        blogs[i]= {_id,title,description,userId,isUpdateDelete:false};
+      }
+    }
     return blogs;
   } catch (error) {
     throw error;
@@ -18,6 +28,7 @@ const getAllBlogs= async () => {
 
 const updateBlog = async (userId, blogId, updatedData) => {
   try {
+    console.log("Update");
     const updatedBlog = await Blog.findOneAndUpdate(
       { userId: userId, _id: blogId },
       { $set: updatedData },
