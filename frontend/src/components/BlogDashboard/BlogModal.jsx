@@ -13,6 +13,8 @@ import {
   MDBTooltip,
 } from "mdb-react-ui-kit";
 import { API_BASE_URL } from "../../config";
+import Comments from "../Comments/Comments";
+
 export default function BlogModal({ blog, fetchBlogs }) {
   useEffect(() => {
     if (blog) {
@@ -20,6 +22,9 @@ export default function BlogModal({ blog, fetchBlogs }) {
         title: blog.title,
         description: blog.description,
       });
+      if (!blog.isUpdateDelete) {
+        setIsUpdateDelete(false);
+      }
     }
   }, []);
   const handleFormChange = (e) => {
@@ -29,9 +34,8 @@ export default function BlogModal({ blog, fetchBlogs }) {
       [name]: value,
     }));
   };
-
-  const handleCreateBlog = async (e) => {
-    e.preventDefault();
+  
+  const handleCreateBlog = async () => {
     const token = localStorage.getItem("token");
     try {
       const response = await fetch(`${API_BASE_URL}/blogs`, {
@@ -47,23 +51,23 @@ export default function BlogModal({ blog, fetchBlogs }) {
         title: "",
         description: "",
       });
-      fetchBlogs(); // Refresh the tasks list to reflect the new blog
+      
     } catch (error) {
       console.error("Failed to create blog:", error);
     }
   };
-  const handleBlog=async(e)=>{
-                if (blog) {          
-                 await updateBlog(e);
-                } else {
-                 await handleCreateBlog(e);
-                }
-              toggleOpen();
-              }
-  const updateBlog = async (e) => {
-    e.preventDefault();
+  const handleBlog = async () => {
+    if (blog) {
+      await updateBlog();
+    } else {
+      await handleCreateBlog();
+    }
+    fetchBlogs(); // Refresh the blogs list to reflect changes
+    toggleOpen();
+  };
+  const updateBlog = async () => {
     const token = localStorage.getItem("token");
-    
+
     try {
       const response = await fetch(`${API_BASE_URL}/blogs/${blog._id}`, {
         method: "PUT",
@@ -77,12 +81,13 @@ export default function BlogModal({ blog, fetchBlogs }) {
         }),
       });
       if (!response.ok) throw new Error("Failed to update blog.");
-      fetchBlogs(); // Refresh the blogs list to reflect changes
+     // fetchBlogs(); // Refresh the blogs list to reflect changes
     } catch (error) {
       console.error("Failed to update blog:", error);
     }
   };
   const [basicModal, setBasicModal] = useState(false);
+  const [isUpdateDelete, setIsUpdateDelete] = useState(true);
   const [formBlog, setFormBlog] = useState({
     title: "",
     description: "",
@@ -105,18 +110,16 @@ export default function BlogModal({ blog, fetchBlogs }) {
       <MDBModal open={basicModal} setOpen={setBasicModal} tabIndex="-1">
         <MDBModalDialog>
           <MDBModalContent>
-            <form
-              onSubmit={handleBlog}
-            >
-              <MDBModalHeader>
-                <MDBModalTitle>Create/Update Blog</MDBModalTitle>
-                <MDBBtn
-                  className="btn-close"
-                  color="none"
-                  onClick={toggleOpen}
-                ></MDBBtn>
-              </MDBModalHeader>
-              <MDBModalBody>
+            <MDBModalHeader>
+              <MDBModalTitle>Create/Update Blog</MDBModalTitle>
+              <MDBBtn
+                className="btn-close"
+                color="none"
+                onClick={toggleOpen}
+              ></MDBBtn>
+            </MDBModalHeader>
+            <MDBModalBody>
+              {isUpdateDelete ? (
                 <MDBInput
                   className="my-4 mx-4 "
                   label="Title"
@@ -126,6 +129,18 @@ export default function BlogModal({ blog, fetchBlogs }) {
                   onChange={handleFormChange}
                   required
                 />
+              ) : (
+                <MDBInput
+                  className="my-4 mx-4 "
+                  label="Title"
+                  type="text"
+                  name="title"
+                  value={formBlog.title}
+                  onChange={handleFormChange}
+                  readonly
+                />
+              )}
+              {isUpdateDelete ? (
                 <MDBTextArea
                   label="Content"
                   className="my-4 mx-4"
@@ -135,17 +150,29 @@ export default function BlogModal({ blog, fetchBlogs }) {
                   rows={4}
                   required
                 />
-              </MDBModalBody>
+              ) : (
+                <MDBTextArea
+                  label="Content"
+                  className="my-4 mx-4"
+                  name="description"
+                  value={formBlog.description}
+                  onChange={handleFormChange}
+                  rows={4}
+                  readonly
+                />
+              )}
+              {(blog) &&(<Comments blogId={blog._id}/>) }
+             
+            </MDBModalBody>
 
-              <MDBModalFooter>
-                <MDBBtn color="secondary" onClick={toggleOpen}>
-                  Close
-                </MDBBtn>
-                <MDBBtn type="submit" >
-                  Save Blog
-                </MDBBtn>
-              </MDBModalFooter>
-            </form>
+            <MDBModalFooter>
+              <MDBBtn color="secondary" onClick={toggleOpen}>
+                Close
+              </MDBBtn>
+              {isUpdateDelete && (
+                <MDBBtn onClick={handleBlog}>Save Blog</MDBBtn>
+              )}
+            </MDBModalFooter>
           </MDBModalContent>
         </MDBModalDialog>
       </MDBModal>

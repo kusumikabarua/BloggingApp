@@ -60,7 +60,7 @@ export default function Register() {
           "Content-Type": "application/json",
         },
       });
-      if (!response.ok) throw new Error("Failed to delete task.");
+      if (!response.ok) throw new Error("Failed to delete blog.");
       fetchBlogs(); // Refresh the blogs list to reflect changes
     } catch (error) {
       console.error("Failed to delete blog:", error);
@@ -134,7 +134,7 @@ export default function Register() {
 
                   {isLoggedIn && (
                    
-                    <BlogModal />
+                    <BlogModal fetchBlogs={fetchBlogs} />
                   )}
                 </div>
               
